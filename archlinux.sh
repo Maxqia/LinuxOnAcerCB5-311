@@ -29,7 +29,7 @@ if [ "$3" != "" ]; then
   echo ""
   echo "WARNING! All data on this device will be wiped out! Continue at your own risk!"
   echo ""
-  read -p "Press [Enter] to install ChrUbuntu on ${target_disk} or CTRL+C to quit"
+  read -p "Press [Enter] to install Arch Linux on ${target_disk} or CTRL+C to quit"
 
   ext_size="`blockdev --getsz ${target_disk}`"
   aroot_size=$((ext_size - 65600 - 33))
@@ -55,7 +55,7 @@ else
   then
     while :
     do
-      read -p "Enter the size in gigabytes you want to reserve for ArchLinux. Acceptable range is 5 to $max_archlinux_size  but $rec_archlinux_size is the recommended maximum: " archlinux_size
+      read -p "Enter the size in gigabytes you want to reserve for Arch Linux. Acceptable range is 5 to $max_archlinux_size  but $rec_archlinux_size is the recommended maximum: " archlinux_size
       if [ ! $archlinux_size -ne 0 2>/dev/null ]
       then
         echo -e "\n\nNumbers only please...\n\n"
@@ -90,7 +90,7 @@ else
 
     #Do the real work
 
-    echo -e "\n\nModifying partition table to make room for ArchLinux." 
+    echo -e "\n\nModifying partition table to make room for Arch Linux." 
     echo -e "Your Chromebook will reboot, wipe your data and then"
     echo -e "you should re-run this script..."
     umount -l /mnt/stateful_partition
@@ -118,9 +118,9 @@ archlinux_version="latest"
 
 echo -e "\nChrome device model is: $hwid\n"
 
-echo -e "Installing ArchLinuxARM ${archlinux_version}\n"
+echo -e "Installing Arch Linux ARM ${archlinux_version}\n"
 
-echo -e "Kernel Arch is: $chromebook_arch  Installing ArchLinuxARM Arch: ${archlinux_arch}\n"
+echo -e "Kernel Arch is: $chromebook_arch  Arch Linux ARM Arch is : ${archlinux_arch}\n"
 
 read -p "Press [Enter] to continue..."
 
@@ -1983,7 +1983,6 @@ EOF
 
 
 echo "console=tty1 debug verbose root=${target_rootfs} rootwait rw lsm.module_locking=0" > kernel-config
-vbutil_arch="arm"
 
 current_rootfs="`rootdev -s`"
 current_kernfs_num=$((${current_rootfs: -1:1}-1))
@@ -1995,30 +1994,25 @@ vbutil_kernel --repack ${target_kern} \
     --version 1 \
     --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
     --config kernel-config \
-    --arch $vbutil_arch
+    --arch arm
 
-#Set Ubuntu kernel partition as top priority for next boot (and next boot only)
+#Set Arch Linux kernel partition as top priority for next boot (and next boot only)
 cgpt add -i 6 -P 5 -T 1 ${target_disk}
 
 echo -e "
 
-Installation seems to be complete. If ArchLinux fails when you reboot,
+Installation seems to be complete. If Arch Linux fails when you reboot,
 power off your Chrome OS device and then turn it back on. You'll be back
-in Chrome OS. If you're happy with ArchLinuxARM when you reboot be sure to run:
+in Chrome OS. If you're happy with Arch Linux when you reboot be sure to run:
 
 sudo cgpt add -i 6 -P 5 -S 1 ${target_disk}
-
-To make it the default boot option. The ArchLinuxARM login is:
-
-Username:  alarm
-Password:  alarm
 
 Root access can either be gained via sudo, or the root user:
 
 Username:  root
 Password:  root
 
-We're now ready to start ArchLinuxARM!
+We're now ready to start Arch Linux!
 "
 
 read -p "Press [Enter] to reboot..."
