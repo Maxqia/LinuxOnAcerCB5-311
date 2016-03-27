@@ -204,50 +204,7 @@ echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf"
 chroot /tmp/arfs /bin/bash -c \
 "pacman -Syy --needed --noconfirm sudo wget dialog base-devel devtools vim rsync git; \
 usermod -aG wheel alarm; \
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers; \
-\
-pacman -Syy --needed --noconfirm \
-        iw networkmanager network-manager-applet \
-        lightdm lightdm-gtk-greeter \
-        chromium chromium-pepper-flash \
-        xorg-server xorg-server-utils xorg-apps xf86-input-synaptics \
-        xorg-twm xorg-xclock xterm xorg-xinit xorg-utils \
-        alsa-lib alsa-utils alsa-tools alsa-oss alsa-firmware alsa-plugins \
-        pulseaudio pulseaudio-alsa; \
-systemctl enable NetworkManager; \
-systemctl enable lightdm"
-
-# add .xinitrc to /etc/skel that defaults to xfce4 session
-cat > /tmp/arfs/etc/skel/.xinitrc <<EOF
-#!/bin/sh
-#
-# ~/.xinitrc
-#
-# Executed by startx (run your window manager from here)
-
-if [ -d /etc/X11/xinit/xinitrc.d ]; then
-  for f in /etc/X11/xinit/xinitrc.d/*; do
-    [ -x "$f" ] && . "$f"
-  done
-  unset f
-fi
-
-# exec gnome-session
-# exec startkde
-exec startxfce4
-# ...or the Window Manager of your choice
-EOF
-
-chroot /tmp/arfs /bin/bash -c \
-"pacman -Syy --needed --noconfirm  xfce4 xfce4-goodies; \
-# copy .xinitrc to already existing home of user 'alarm'
-cp /etc/skel/.xinitrc /home/alarm/.xinitrc; \
-cp /etc/skel/.xinitrc /home/alarm/.xprofile; \
-sed -i 's/exec startxfce4/# exec startxfce4/' /home/alarm/.xprofile; \
-chown alarm:users /home/alarm/.xinitrc; \
-chown alarm:users /home/alarm/.xprofile; \
-\
-pacman -Syy --needed --noconfirm  sshfs screen file-roller"
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers"
 
 # hack for removing uap0 device on startup (avoid freeze)
 echo 'install mwifiex_sdio /sbin/modprobe --ignore-install mwifiex_sdio && sleep 1 && iw dev uap0 del' > /tmp/arfs/etc/modprobe.d/mwifiex.conf 
@@ -262,6 +219,7 @@ LABEL="tegra_lid_switch_end"
 EOF
 
 # alsa mixer settings to enable internal speakers
+mkdir /tmp/arfs/var/lib/alsa/
 cat > /tmp/arfs/var/lib/alsa/asound.state <<EOF
 state.HDATegra {
 	control.1 {
