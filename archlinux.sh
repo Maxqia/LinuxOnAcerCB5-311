@@ -190,33 +190,22 @@ then
 fi
 cp -ar /lib/firmware/* /tmp/arfs/lib/firmware/
 
-cat > /tmp/arfs/install-kernel.sh <<EOF
-pacman -Syy --needed --noconfirm linux-armv7 linux-armv7-chromebook
-dd if=/boot/vmlinux.kpart of=${target_kern}
-echo elan_i2c > /etc/modules-load.d/elan_touchpad.conf
-echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf
-EOF
-
-chmod a+x /tmp/arfs/install-kernel.sh
-chroot /tmp/arfs /bin/bash -c /install-kernel.sh
-rm /tmp/arfs/install-kernel.sh
+chroot /tmp/arfs /bin/bash -c \
+"pacman -Syy --needed --noconfirm linux-armv7 linux-armv7-chromebook; \
+dd if=/boot/vmlinux.kpart of=${target_kern}; \
+echo elan_i2c > /etc/modules-load.d/elan_touchpad.conf; \
+echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf"
 
 #
 # Add some development tools and put the alarm user into the
 # wheel group. Furthermore, grant ALL privileges via sudo to users
 # that belong to the wheel group
 #
-cat > /tmp/arfs/install-develbase.sh <<EOF
-pacman -Syy --needed --noconfirm sudo wget dialog base-devel devtools vim rsync git
-usermod -aG wheel alarm
-sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers
-EOF
-
-chmod a+x /tmp/arfs/install-develbase.sh
-chroot /tmp/arfs /bin/bash -c /install-develbase.sh
-rm /tmp/arfs/install-develbase.sh
-
-cat > /tmp/arfs/install-xbase.sh <<EOF
+chroot /tmp/arfs /bin/bash -c \
+"pacman -Syy --needed --noconfirm sudo wget dialog base-devel devtools vim rsync git; \
+usermod -aG wheel alarm; \
+sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers; \
+\
 pacman -Syy --needed --noconfirm \
         iw networkmanager network-manager-applet \
         lightdm lightdm-gtk-greeter \
@@ -224,14 +213,9 @@ pacman -Syy --needed --noconfirm \
         xorg-server xorg-server-utils xorg-apps xf86-input-synaptics \
         xorg-twm xorg-xclock xterm xorg-xinit xorg-utils \
         alsa-lib alsa-utils alsa-tools alsa-oss alsa-firmware alsa-plugins \
-        pulseaudio pulseaudio-alsa
-systemctl enable NetworkManager
-systemctl enable lightdm
-EOF
-
-chmod a+x /tmp/arfs/install-xbase.sh
-chroot /tmp/arfs /bin/bash -c /install-xbase.sh
-rm /tmp/arfs/install-xbase.sh
+        pulseaudio pulseaudio-alsa; \
+systemctl enable NetworkManager; \
+systemctl enable lightdm"
 
 # add .xinitrc to /etc/skel that defaults to xfce4 session
 cat > /tmp/arfs/etc/skel/.xinitrc <<EOF
@@ -254,27 +238,16 @@ exec startxfce4
 # ...or the Window Manager of your choice
 EOF
 
-cat > /tmp/arfs/install-xfce4.sh <<EOF
-pacman -Syy --needed --noconfirm  xfce4 xfce4-goodies
+chroot /tmp/arfs /bin/bash -c \
+"pacman -Syy --needed --noconfirm  xfce4 xfce4-goodies; \
 # copy .xinitrc to already existing home of user 'alarm'
-cp /etc/skel/.xinitrc /home/alarm/.xinitrc
-cp /etc/skel/.xinitrc /home/alarm/.xprofile
-sed -i 's/exec startxfce4/# exec startxfce4/' /home/alarm/.xprofile
-chown alarm:users /home/alarm/.xinitrc
-chown alarm:users /home/alarm/.xprofile
-EOF
-
-chmod a+x /tmp/arfs/install-xfce4.sh
-chroot /tmp/arfs /bin/bash -c /install-xfce4.sh
-rm /tmp/arfs/install-xfce4.sh
-
-cat > /tmp/arfs/install-utils.sh <<EOF
-pacman -Syy --needed --noconfirm  sshfs screen file-roller
-EOF
-
-chmod a+x /tmp/arfs/install-utils.sh
-chroot /tmp/arfs /bin/bash -c /install-utils.sh
-rm /tmp/arfs/install-utils.sh
+cp /etc/skel/.xinitrc /home/alarm/.xinitrc; \
+cp /etc/skel/.xinitrc /home/alarm/.xprofile; \
+sed -i 's/exec startxfce4/# exec startxfce4/' /home/alarm/.xprofile; \
+chown alarm:users /home/alarm/.xinitrc; \
+chown alarm:users /home/alarm/.xprofile; \
+\
+pacman -Syy --needed --noconfirm  sshfs screen file-roller"
 
 # hack for removing uap0 device on startup (avoid freeze)
 echo 'install mwifiex_sdio /sbin/modprobe --ignore-install mwifiex_sdio && sleep 1 && iw dev uap0 del' > /tmp/arfs/etc/modprobe.d/mwifiex.conf 
