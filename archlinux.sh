@@ -1982,7 +1982,7 @@ state.Venice2 {
 EOF
 
 
-echo "console=tty1 debug verbose root=${target_rootfs} rootwait rw lsm.module_locking=0" > kernel-config
+echo "console=tty1 debug verbose root=UUID="$(blkid $target_rootfs | cut -d '"' -f 2)" rootwait rw lsm.module_locking=0" > kernel-config
 
 current_rootfs="`rootdev -s`"
 current_kernfs_num=$((${current_rootfs: -1:1}-1))
