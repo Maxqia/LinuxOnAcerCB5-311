@@ -23,8 +23,8 @@ fi
 
 #setterm -blank 0
 
-if [ "$3" != "" ]; then
-  target_disk=$3
+if [ "$1" != "" ]; then
+  target_disk=$1
   echo "Got ${target_disk} as target drive"
   echo ""
   echo "WARNING! All data on this device will be wiped out! Continue at your own risk!"
@@ -33,13 +33,11 @@ if [ "$3" != "" ]; then
 
   ext_size="`blockdev --getsz ${target_disk}`"
   aroot_size=$((ext_size - 65600 - 33))
-  parted --script ${target_disk} "mktable gpt"
   cgpt create ${target_disk} 
   cgpt add -i 6 -b 64 -s 32768 -S 1 -P 5 -l KERN-A -t "kernel" ${target_disk}
   cgpt add -i 7 -b 65600 -s $aroot_size -l ROOT-A -t "rootfs" ${target_disk}
   sync
   blockdev --rereadpt ${target_disk}
-  partprobe ${target_disk}
   crossystem dev_boot_usb=1
 else
   target_disk="`rootdev -d -s`"
@@ -194,7 +192,7 @@ cp -ar /lib/firmware/* /tmp/arfs/lib/firmware/
 
 cat > /tmp/arfs/install-kernel.sh <<EOF
 pacman -Syy --needed --noconfirm linux-armv7 linux-armv7-chromebook
-dd if=/boot/vmlinux.kpart of=/dev/${target_kern}
+dd if=/boot/vmlinux.kpart of=${target_kern}
 echo elan_i2c > /etc/modules-load.d/elan_touchpad.conf
 echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf
 EOF
