@@ -190,12 +190,6 @@ then
 fi
 cp -ar /lib/firmware/* /tmp/arfs/lib/firmware/
 
-chroot /tmp/arfs /bin/bash -c \
-"pacman -Syy --needed --noconfirm linux-armv7 linux-armv7-chromebook; \
-dd if=/boot/vmlinux.kpart of=${target_kern}; \
-echo elan_i2c > /etc/modules-load.d/elan_touchpad.conf; \
-echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf"
-
 #
 # Add some development tools and put the alarm user into the
 # wheel group. Furthermore, grant ALL privileges via sudo to users
@@ -205,6 +199,13 @@ chroot /tmp/arfs /bin/bash -c \
 "pacman -Syy --needed --noconfirm sudo wget dialog base-devel devtools vim rsync git; \
 usermod -aG wheel alarm; \
 sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /etc/sudoers"
+
+chroot /tmp/arfs /bin/bash -c \
+"pacman -Syyu --noconfirm; \
+dd if=/boot/vmlinux.kpart of=${target_kern}; \
+echo elan_i2c > /etc/modules-load.d/elan_touchpad.conf; \
+echo bq24735_charger > /etc/modules-load.d/bq2473_charger.conf"
+
 
 # hack for removing uap0 device on startup (avoid freeze)
 echo 'install mwifiex_sdio /sbin/modprobe --ignore-install mwifiex_sdio && sleep 1 && iw dev uap0 del' > /tmp/arfs/etc/modprobe.d/mwifiex.conf 
