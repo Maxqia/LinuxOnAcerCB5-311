@@ -1937,6 +1937,10 @@ in Chrome OS. If you're happy with Arch Linux when you reboot be sure to run:
 
 sudo cgpt add -i 6 -P 5 -S 1 ${target_disk}
 
+To make it the default boot option. The login is:
+Username:  alarm
+Password:  alarm
+
 Root access can either be gained via sudo, or the root user:
 
 Username:  root
