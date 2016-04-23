@@ -1912,16 +1912,12 @@ state.Venice2 {
 EOF
 
 
-echo "console=tty1 debug verbose root=UUID="$(blkid $target_rootfs | cut -d '"' -f 2)" rootwait rw lsm.module_locking=0" > kernel-config
-
-current_rootfs="`rootdev -s`"
-current_kernfs_num=$((${current_rootfs: -1:1}-1))
-current_kernfs=${current_rootfs: 0:-1}$current_kernfs_num
+echo "debug verbose console=tty0 init=/sbin/init root=UUID="$(blkid $target_rootfs | cut -d '"' -f 2)" rootwait rw noinitrd lsm.module_locking=0" > kernel-config
 
 vbutil_kernel --repack ${target_kern} \
-    --oldblob $current_kernfs \
-    --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
+    --oldblob ${target_kern} \
     --version 1 \
+    --keyblock /usr/share/vboot/devkeys/kernel.keyblock \
     --signprivate /usr/share/vboot/devkeys/kernel_data_key.vbprivk \
     --config kernel-config \
     --arch arm
