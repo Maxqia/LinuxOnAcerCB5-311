@@ -184,11 +184,11 @@ echo -e "\n127.0.1.1\tlocalhost.localdomain\tlocalhost\talarm" >> /tmp/arfs/etc/
 #mkdir -p /tmp/arfs/lib/modules/$KERN_VER/
 #cp -ar /lib/modules/$KERN_VER/* /tmp/arfs/lib/modules/$KERN_VER/
 
-if [ ! -d /tmp/arfs/lib/firmware/ ]
-then
-  mkdir /tmp/arfs/lib/firmware/
-fi
-cp -ar /lib/firmware/* /tmp/arfs/lib/firmware/
+#if [ ! -d /tmp/arfs/lib/firmware/ ]
+#then
+#  mkdir /tmp/arfs/lib/firmware/
+#fi
+#cp -ar /lib/firmware/* /tmp/arfs/lib/firmware/
 
 #
 # Add some development tools and put the alarm user into the
